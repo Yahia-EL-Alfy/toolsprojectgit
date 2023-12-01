@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	host     = "127.0.0.1"
+	host     = "mydb"
 	port     = 5432
 	user     = "postgres"
 	password = "yahia2002"
@@ -126,9 +126,10 @@ func AddSlot(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Log the raw request body
+	// Set the 'empty' field to a default value, e.g., true or false
+	emptyValue := true // You can set it to false if the slot is not empty by default
 
-	_, err = db.Exec("INSERT INTO slots (user_id, date, hour) VALUES ($1, $2, $3)", userid, slot.Date, slot.Hour)
+	_, err = db.Exec("INSERT INTO slots (user_id, date, hour, empty) VALUES ($1, $2, $3, $4)", userid, slot.Date, slot.Hour, emptyValue)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -136,7 +137,6 @@ func AddSlot(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprintln(w, "Slot added successfully")
 }
-
 func GetAllDoctors(w http.ResponseWriter, r *http.Request) {
 	// Query the database to get all doctors
 	rows, err := db.Query("SELECT id, email, first_name, last_name FROM users WHERE is_doctor = true")
