@@ -1,0 +1,49 @@
+<!-- Section: Design Block -->
+<section class="text-center">
+  <!-- Background image -->
+  <div class="p-5 bg-image" style="
+    background-image: url('https://mdbootstrap.com/img/new/textures/full/171.jpg');
+    height: 300px;
+  "></div>
+  <!-- Background image -->
+
+  <div class="card mx-4 mx-md-5 shadow-5-strong" style="
+    margin-top: -100px;
+    background: hsla(0, 0%, 100%, 0.8);
+    backdrop-filter: blur(20px);
+  ">
+    <div class="card-header">
+      <h2 class="fw-bold mb-5">Make Reservation</h2>
+    </div>
+    <div class="card-body py-5 px-md-5">
+
+      <div class="row d-flex justify-content-center">
+        <div class="col-lg-8">
+          <div class="time__container">
+            <div class="section">
+            </div>
+            <form (ngSubmit)="onReserve()" class="form__time" #myForm="ngForm">
+              <div class="doctor">
+                <label for="doctor">Doctor</label>
+                <select id="doctor" name="selectedDoctor" class="form-control" [(ngModel)]="selectedDoctor" (change)="onSelectedDoctorChange()">
+                  <option *ngFor="let doctor of doctors" [value]="doctor.user_id">{{ doctor.first_name }} {{ doctor.last_name }}</option>
+                </select>
+              </div>
+          
+              <div class="appointment">
+                <label for="appointment">Choose Appointment</label>
+                <select id="appointment" name="selectedAppointment" class="form-control" [(ngModel)]="selectedAppointment!.slot_id" (change)="onSelectedappChange()">
+                  <option *ngFor="let option of appointmentOptions" [value]="option.slot_id">{{ option.date }} ( {{ option.hour }} )</option>
+                </select>
+              </div>
+              <div>
+                <button type="submit" class="btn btn-primary btn-lg mr-2">Reserve</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- Section: Design Block -->

@@ -1,0 +1,90 @@
+<!-- Section: Design Block -->
+<section class="text-center">
+    <!-- Background image -->
+    <div class="p-5 bg-image" style="
+          background-image: url('https://mdbootstrap.com/img/new/textures/full/171.jpg');
+          height: 300px;
+          "></div>
+    <!-- Background image -->
+  
+    <div class="card mx-4 mx-md-5 shadow-5-strong" style="
+          margin-top: -100px;
+          background: hsla(0, 0%, 100%, 0.8);
+          backdrop-filter: blur(20px);
+          ">
+      <div class="card-body py-5 px-md-5">
+  
+        <div class="row d-flex justify-content-center">
+          <div class="col-lg-8">
+            <h2 class="fw-bold mb-5">Sign up</h2>
+            <form (ngSubmit)="saveUser()" #signupForm="ngForm">
+              <!-- 2 column grid layout with text inputs for the first and last names -->
+              <div class="row">
+                <div class="col-md-6 mb-4">
+                  <div class="form-outline">
+                    <input type="text" id="form3Example1" [(ngModel)]="first_name" name="first_name" class="form-control" placeholder="First Name" required />
+                    <label class="form-label"></label>
+                    <!-- Display error message if the field is empty -->
+                    <div *ngIf="signupForm.controls['first_name'].invalid && signupForm.controls['first_name'].touched" class="text-danger">
+                      First Name is required.
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                  <div class="form-outline">
+                    <input type="text" id="form3Example2" [(ngModel)]="last_name" name="last_name" class="form-control" placeholder="Last Name" required />
+                    <label class="form-label"></label>
+                    <!-- Display error message if the field is empty -->
+                    <div *ngIf="signupForm.controls['last_name'].invalid && signupForm.controls['last_name'].touched" class="text-danger">
+                      Last Name is required.
+                    </div>
+                  </div>
+                </div>
+              </div>
+  
+              <!-- Email input -->
+              <div class="form-outline mb-4">
+                <input type="email" id="form3Example3" class="form-control" [(ngModel)]="email" name="email" placeholder="Email address" required />
+                <label class="form-label"></label>
+                <!-- Display error message if the field is empty -->
+                <div *ngIf="signupForm.controls['email'].invalid && signupForm.controls['email'].touched" class="text-danger">
+                  Email is required.
+                </div>
+              </div>
+  
+              <!-- Password input -->
+              <div class="form-outline mb-4">
+                <input type="password" id="form3Example4" class="form-control" [(ngModel)]="password" name="password" placeholder="Password" required />
+                <label class="form-label"></label>
+                <!-- Display error message if the field is empty -->
+                <div *ngIf="signupForm.controls['password'].invalid && signupForm.controls['password'].touched" class="text-danger">
+                  Password is required.
+                </div>
+              </div>
+  
+              <div class="form-check form-switch mb-4">
+                <div class="role-switch-container">
+                  <label class="form-check-label" for="roleSwitch">I am a Doctor</label>
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="roleSwitch"
+                    [(ngModel)]="is_doctor"
+                    name="is_doctor"
+                  />
+                </div>
+              </div>
+              
+              <!-- Submit button -->
+              <div>
+                <button type="submit" class="btn btn-primary btn-block mb-4" [disabled]="signupForm.invalid">
+                  Sign up
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+<!-- Section: Design Block -->

@@ -1,0 +1,26 @@
+
+/* Flexbox style for the form-check div */
+.form-check {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Adjust margin for spacing */
+  .form-check .form-check-label {
+    margin-right: 45px; /* You can adjust the margin as needed */
+  }
+  
+
+.role-switch-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f8f9fa; /* Optional background color */
+  }
+
+
+  

@@ -1,0 +1,77 @@
+@import url(https://fonts.googleapis.com/css?family=Oxygen:700,400,300);
+html {
+  background-color: #E8F0FA;
+  font-family: "Oxygen", sans-serif;
+}
+
+.container {
+  max-width: 60rem;
+  margin: 0 auto;
+}
+
+h2{
+    display: inline;
+}
+
+
+
+
+button {
+    
+  font-size: 13px;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 1px;
+  background-color: #3f4f95;
+  border: 1px solid #DADDE8;
+  color: #fff;
+  width:140px;
+  height: 45px;
+  border-radius: 5px;
+  outline: none;
+  left: 450px;
+  margin-top: 25px;
+}
+
+.form__time .doctor {
+    margin:0 auto;
+    width: 200px; 
+    margin-bottom: 15px;
+  }
+ 
+  .form__time .appointment{
+   
+    width: 500px;
+    justify-content: center;
+    margin:0 auto;
+  }
+  .form__time .doctor select , .form__time .appointment select {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    background: transparent;
+    border: 1px solid #3d4c90; 
+    border-radius: 3px;
+    outline: none;
+    padding: 10px;
+    transition: border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    color: #3c4c8f;
+    width: 100%;
+  }
+  
+  
+  .form__time button {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 1px;
+    background-color: #3f4f95;
+    border: 1px solid #3d4c90; 
+    color: #fff;
+    width: 150px;
+    height: 50px;
+    border-radius: 5px;
+    outline: none;
+    margin-bottom: 20px;
+  }
+  
