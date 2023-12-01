@@ -5,7 +5,8 @@ docker run -d --name mydb --network=mynetwork \
   -e POSTGRES_USER=postgres \
   -e POSTGRES_PASSWORD=yahia2002 \
   -e POSTGRES_DB=toolsproject \
-  -p 5432:5432 postgresimage:0.6
+  -p 5432:5432 \
+  -v mydb_data:/var/lib/postgresql/data postgresimage:0.6
 
 echo "Waiting for PostgreSQL container to start..."
 sleep 5
