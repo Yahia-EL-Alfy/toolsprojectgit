@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  mydb:
+    image: postgresimage:0.6
+    container_name: mydb  # Set the container name explicitly
+    environment:
+      POSTGRES_DB: toolsproject
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: yahia2002
+    networks:
+      - mynetwork
+    expose:
+      - "5432"
+    restart: always
+
+  backendgo:
+    image: backendgo:1.4
+    container_name: backendcon  # Set the container name explicitly
+    networks:
+      - mynetwork
+    expose:
+      - "8080"
+    depends_on:
+      - mydb
+    restart: always
+
+  frontend:
+    image: frontend:0.6
+    networks:
+      - mynetwork
+    ports:
+      - "4200:80"
+    restart: always
+
+networks:
+  mynetwork:
+    driver: bridge
