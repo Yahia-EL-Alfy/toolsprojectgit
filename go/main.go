@@ -1,18 +1,23 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
+	_ "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 	"log"
 	"net/http"
+	"strings"
+	"time"
 )
 
 const (
-	host     = "mydb"
+	host     = "127.0.0.1"
 	port     = 5432
 	user     = "postgres"
 	password = "yahia2002"
@@ -73,6 +78,79 @@ func initDB() {
 	fmt.Println("Successfully connected to the database")
 }
 
+var secretKey = []byte("yayamaya")
+
+func generateToken(userID int, isDoctor bool) string {
+	claims := jwt.MapClaims{
+		"user_id":   userID,
+		"is_doctor": isDoctor,
+		"exp":       time.Now().Add(time.Hour * 24).Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	tokenString, err := token.SignedString(secretKey)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return tokenString
+}
+
+func authenticateToken(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		tokenString := r.Header.Get("Authorization")
+		if tokenString == "" {
+			http.Error(w, "Token not provided", http.StatusUnauthorized)
+			return
+		}
+
+		// Remove the "Bearer " prefix
+		tokenString = strings.TrimPrefix(tokenString, "Bearer ")
+
+		claims := jwt.MapClaims{}
+		token, err := jwt.ParseWithClaims(tokenString, &claims, func(token *jwt.Token) (interface{}, error) {
+			return []byte("yayamaya"), nil
+		})
+
+		if err != nil || !token.Valid {
+			http.Error(w, "Invalid token", http.StatusUnauthorized)
+			fmt.Println("Invalid token:", err)
+			return
+		}
+
+		// Print the actual token value
+		fmt.Println("Token:", tokenString)
+
+		// Pass the user ID and role to the next handler
+		r = r.WithContext(context.WithValue(r.Context(), "user_id", int(claims["user_id"].(float64))))
+		r = r.WithContext(context.WithValue(r.Context(), "is_doctor", claims["is_doctor"].(bool)))
+
+		next.ServeHTTP(w, r)
+	})
+}
+
+func AddSlot(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value("user_id").(int)
+	var slot Slot
+	err := json.NewDecoder(r.Body).Decode(&slot)
+	if err != nil {
+		http.Error(w, "Error parsing request body", http.StatusBadRequest)
+		fmt.Println("Raw Request Body:", r.Body)
+		return
+	}
+
+	// Log the raw request body
+
+	_, err = db.Exec("INSERT INTO slots (user_id, date, hour) VALUES ($1, $2, $3)", userID, slot.Date, slot.Hour)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Fprintln(w, "Slot added successfully")
+}
+
 func SignUp(w http.ResponseWriter, r *http.Request) {
 	var user User
 	err := json.NewDecoder(r.Body).Decode(&user)
@@ -114,31 +192,17 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 		"is_doctor": dbUser.IsDoctor,
 	}
 
+	token := generateToken(userid, dbUser.IsDoctor)
+	// Update the values of jsonResponse within the if block
+	jsonResponse["token"] = token
+
 	json.NewEncoder(w).Encode(jsonResponse)
+	print(token)
 }
 
-func AddSlot(w http.ResponseWriter, r *http.Request) {
-	var slot Slot
-	err := json.NewDecoder(r.Body).Decode(&slot)
-	if err != nil {
-		http.Error(w, "Error parsing request body", http.StatusBadRequest)
-		fmt.Println("Raw Request Body:", r.Body)
-		return
-	}
-
-	// Set the 'empty' field to a default value, e.g., true or false
-	emptyValue := true // You can set it to false if the slot is not empty by default
-
-	_, err = db.Exec("INSERT INTO slots (user_id, date, hour, empty) VALUES ($1, $2, $3, $4)", userid, slot.Date, slot.Hour, emptyValue)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	fmt.Fprintln(w, "Slot added successfully")
-}
 func GetAllDoctors(w http.ResponseWriter, r *http.Request) {
 	// Query the database to get all doctors
+
 	rows, err := db.Query("SELECT id, email, first_name, last_name FROM users WHERE is_doctor = true")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -355,15 +419,15 @@ func main() {
 	initDB()
 
 	r := mux.NewRouter()
-	r.HandleFunc("/addslot", AddSlot).Methods("POST")
-	r.HandleFunc("/signin", SignIn).Methods("POST")
-	r.HandleFunc("/signup", SignUp).Methods("POST")
-	r.HandleFunc("/getdoctors", GetAllDoctors).Methods("GET")
-	r.HandleFunc("/getdoctorslots", GetDoctorSlots).Methods("GET")
-	r.HandleFunc("/makeappointment", MakeAppointment).Methods("POST")
-	r.HandleFunc("/getuserappointments", GetUserAppointments).Methods("GET")
-	r.HandleFunc("/cancelappointment", CancelAppointment).Methods("POST")
-	r.HandleFunc("/getdoctorslotsbyid", GetDoctorSlotsByID).Methods("GET")
+	r.Handle("/addslot", authenticateToken(http.HandlerFunc(AddSlot))).Methods("POST")
+	r.Handle("/signin", http.HandlerFunc(SignIn)).Methods("POST")
+	r.Handle("/signup", http.HandlerFunc(SignUp)).Methods("POST")
+	r.Handle("/getdoctors", http.HandlerFunc(GetAllDoctors)).Methods("GET")
+	r.Handle("/getdoctorslots", http.HandlerFunc(GetDoctorSlots)).Methods("GET")
+	r.Handle("/makeappointment", authenticateToken(http.HandlerFunc(MakeAppointment))).Methods("POST")
+	r.Handle("/getuserappointments", authenticateToken(http.HandlerFunc(GetUserAppointments))).Methods("GET")
+	r.Handle("/cancelappointment", authenticateToken(http.HandlerFunc(CancelAppointment))).Methods("POST")
+	r.Handle("/getdoctorslotsbyid", authenticateToken(http.HandlerFunc(GetDoctorSlotsByID))).Methods("GET")
 
 	// Enable CORS
 	corsMiddleware := handlers.CORS(
